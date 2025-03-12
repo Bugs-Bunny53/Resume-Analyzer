@@ -15,9 +15,13 @@ app.use(json());
 /**
  * define route handlers
  */
-// Generic entry point
+app.use('/job-titles', (req, res, next) => {
+  console.log('🤝 Incoming request for Job Data!');
+  apiRouter(req, res, next);
+});
+
 app.use('/', (req, res, next) => {
-  console.log('🗨️ Incoming request to server!');
+  console.log('🫚 Incoming request for root!');
   apiRouter(req, res, next);
 });
 
@@ -26,7 +30,6 @@ app.use((req, res) => {
   console.log('🔒 404 Response Sent!');
   res.status(404).send('404 Page Not Found');
 });
-
 
 // global error handler
 app.use((err, req, res, next) => {
