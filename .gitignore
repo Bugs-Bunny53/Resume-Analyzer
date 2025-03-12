@@ -40,3 +40,5 @@ database/db_29_2_mssql/38_basic_interests_to_riasec.sql
 database/db_29_2_mssql/39_interests_illus_activities.sql
 database/db_29_2_mssql/40_interests_illus_occupations.sql
 Server/.env
+Server/.env
+Server/.env
