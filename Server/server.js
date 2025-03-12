@@ -11,6 +11,8 @@ import apiRouter from './routes/oNetRouter';
  * handle parsing request body
  */
 app.use(json());
+app.use(express.urlencoded({ extended: true }));
+
 
 /**
  * define route handlers
@@ -18,6 +20,11 @@ app.use(json());
 app.use('/job-titles', (req, res, next) => {
   console.log('🤝 Incoming request for Job Data!');
   apiRouter(req, res, next);
+});
+
+app.use("/upload", (req, res, next) => {
+  console.log('📜 Incoming resume upload!');
+  uploadRouter(req, res, next)
 });
 
 app.use('/', (req, res, next) => {
