@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-/Server.env
+.env
 database/db_29_2_mssql/01_content_model_reference.sql
 database/db_29_2_mssql/02_job_zone_reference.sql
 database/db_29_2_mssql/03_occupation_data.sql
