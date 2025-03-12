@@ -1,6 +1,6 @@
-import oNetController from '../controllers/oNetController';
-import { router } from './oNetRouter';
 
+import { router } from './oNetRouter';
+import authController from '../controllers/authController'
 // * Router to handle login requests
 router.post('/login', authController.login, (req, res) => {
   return res.status(200).send('login button');
