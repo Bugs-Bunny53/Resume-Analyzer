@@ -1,4 +1,4 @@
-import axios  from 'axios';
+import { pool } from '../data/db';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -7,19 +7,42 @@ const oNetController = {};
 oNetController.getJobListings = (req, res, next) => {
   console.log('⚒️ Getting Job Listings from oNet SQL DB');
 
-  res.json({
-    message: "This will return all job titles from the local oNet database.",
-    data: [] // Replace with actual data later
-});
-
+  pool
+    .query('SELECT title FROM occupations')
+    .then((result) => {
+      if (result.rows.length === 0) {
+        throw Error;
+      }
+      res.locals.titles = result.rows;
+    })
+    .then(next())
+    .catch((error) => {
+      return next({
+        log: 'Shit went sideways in the SQL request for job listings...',
+        status: 500,
+        message: { err: error },
+      });
+    });
 };
 
 oNetController.getJobDetails = (req, res) => {
+  console.log('🕵️ Getting Job Details from oNet SQL DB');
   const { title } = req.params;
 
-  // Placeholder response until database integration is complete
-  res.json({
-      message: `This will return detailed information for the job title: ${title}`,
-      data: {} // Replace with actual data later
-  });
+  pool
+    .query('SELECT * FROM occupations WHERE title = $1', [title])
+    .then((result) => {
+      if (result.rows.length === 0) {
+        throw Error;
+      }
+      res.locals.details = result.rows;
+    })
+    .then(next())
+    .catch((error) => {
+      return next({
+        log: 'Shit went sideways in the SQL request for job listings...',
+        status: 500,
+        message: { err: error },
+      });
+    });
 };
