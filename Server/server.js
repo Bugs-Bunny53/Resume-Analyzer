@@ -1,18 +1,16 @@
-const express = require('express');
+import express, { json } from 'express';
 const app = express();
 const PORT = 3000;
 
 /**
  * require routers
  */
-const router = require('./routes/api.js');
-const apiRouter = require('./routes/characters.js');
-const favRouter = require('./routes/favs.js');
+import apiRouter from './routes/apiRouter';
 
 /**
  * handle parsing request body
  */
-app.use(express.json());
+app.use(json());
 
 /**
  * define route handlers
@@ -50,4 +48,4 @@ app.listen(PORT, () => {
   console.log(`Server listening on port: ${PORT}`);
 });
 
-module.exports = app;
+export default app;
