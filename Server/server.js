@@ -5,7 +5,7 @@ const PORT = 3000;
 /**
  * require routers
  */
-import apiRouter from './routes/apiRouter';
+import apiRouter from './routes/oNetRouter';
 
 /**
  * handle parsing request body
@@ -16,8 +16,8 @@ app.use(json());
  * define route handlers
  */
 // Generic entry point
-app.use('/api/characters', (req, res, next) => {
-  console.log('🗨️ Characters route accessed.');
+app.use('/', (req, res, next) => {
+  console.log('🗨️ Incoming request to server!');
   apiRouter(req, res, next);
 });
 
