@@ -1,29 +1,3 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
-
-node_modules
-dist
-dist-ssr
-*.local
-
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-
-/Server.env
 database/db_29_2_mssql/01_content_model_reference.sql
 database/db_29_2_mssql/02_job_zone_reference.sql
 database/db_29_2_mssql/03_occupation_data.sql
