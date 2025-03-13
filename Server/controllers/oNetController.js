@@ -13,13 +13,13 @@ oNetController.getJobListings = async (req, res, next) => {
   console.log('⚒️ Fetching Job Listings from O*NET API');
 
   try {
-    const response = await axios.get(`${ONET_API_BASE_URL}online/search`, {
-      params: { keyword: '' },
+    const response = await axios.get(`${ONET_API_BASE_URL}online/occupations/`, {
       headers: {
         'X-API-Key': ONET_API_KEY,
         'Accept': 'application/json'
       }
     });
+    
 
     if (!response.data || !response.data.occupation) {
       throw new Error('No job listings found.');
