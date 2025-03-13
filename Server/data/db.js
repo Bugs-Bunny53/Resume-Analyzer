@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+// import { createClient } from '@supabase/supabase-js';
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
@@ -14,7 +14,7 @@ dotenv.config();
 
 const connectDB = () => {
   mongoose
-    .connect(process.env.MONGO_URI, {})
+    .connect(process.env.MONGODB_URI, {})
     .then(() => console.log("🏪 Connected to Mongo Resume Database."))
     .catch((error) => {
       console.error("❌🏪 Unable to connect to Mongo Resume Database: ", error.message);

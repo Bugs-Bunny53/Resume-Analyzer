@@ -1,4 +1,4 @@
-import pdfParse from "pdf-parse";
+import { PDFDocument } from "pdf-lib";
 import docx4js from "docx4js";
 import fs from "fs/promises";
 
@@ -6,8 +6,15 @@ export const extractTextFromFile = async (filePath, mimeType) => {
   const fileBuffer = await fs.readFile(filePath);
 
   if (mimeType === "application/pdf") {
-    const data = await pdfParse(fileBuffer);
-    return data.text;
+    try {
+      const pdfDoc = await PDFDocument.load(fileBuffer);
+      const pages = pdfDoc.getPages();
+      const text = pages.map((page) => page.getTextContent?.() || "").join("\n");
+      return text;
+    } catch (error) {
+      console.error("Error extracting text from PDF:", error);
+      throw new Error("Failed to extract text from PDF.");
+    }
   }
 
   if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
@@ -15,5 +22,5 @@ export const extractTextFromFile = async (filePath, mimeType) => {
     return doc.toString();
   }
 
-  throw new Error("Your file format sucks");
+  throw new Error("Unsupported file format");
 };

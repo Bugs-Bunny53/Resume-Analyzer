@@ -1,5 +1,5 @@
 import express from "express";
-import oNetController from "../controllers/oNetController";
+import oNetController from "../controllers/oNetController.js";
 
 export const router = express.Router();
 

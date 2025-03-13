@@ -9,7 +9,10 @@ connectDB();
 /**
  * require routers
  */
-import apiRouter from './routes/oNetRouter';
+import oNetRouter from './routes/oNetRouter.js';
+import authRouter from './routes/authRouter.js'
+import dataRouter from './routes/dataRouter.js'
+import uploadRouter from './routes/uploadRouter.js'
 
 /**
  * handle parsing request body

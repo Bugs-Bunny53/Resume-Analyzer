@@ -1,4 +1,8 @@
-import { router } from "./oNetRouter";
-import dataController from "../controllers/dataController";
+import express from "express";
+import dataController from "../controllers/dataController.js";
 
-app.get("/getData", dataController.getDataFromDatabase);
+export const router = express.Router();
+
+router.get("/getData", dataController.getDataFromDatabase);
+
+export default router
