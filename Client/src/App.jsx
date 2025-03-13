@@ -1,10 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+import reactLogo from "./assets/react.svg";
+import viteLogo from "/vite.svg";
+import "./App.css";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+
+  document
+    .getElementById("workExperience")
+    .addEventListener("click", async () => {
+      try {
+        const response = await fetch("/getData");
+        const data = await response.json();
+        popup(data);
+      } catch (error) {
+        console.error("error", error);
+      }
+    });
+
+  function popup(data) {}
 
   return (
     <>
@@ -29,7 +43,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
