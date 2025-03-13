@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import yaml from 'js-yaml';
-import { extractTextFromFile } from '../utils/fileProcessor';
+import { extractTextFromFile } from '../utils/extractTextFromFile';
 import { convertTextToYAML } from '../utils/convertTextToYAML';
 
 const uploadController = {};

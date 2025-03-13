@@ -15,11 +15,11 @@ app.use(express.urlencoded({ extended: true }));
 
 
 /**
- * define route handlers
+ * define route handlers`
  */
 app.use('/job-titles', (req, res, next) => {
   console.log('🤝 Incoming request for Job Data!');
-  apiRouter(req, res, next);
+  oNetRouter(req, res, next);
 });
 
 app.use("/upload", (req, res, next) => {
@@ -29,7 +29,7 @@ app.use("/upload", (req, res, next) => {
 
 app.use('/', (req, res, next) => {
   console.log('🫚 Incoming request for root!');
-  apiRouter(req, res, next);
+  authRouter(req, res, next);
 });
 
 // catch-all route handler for any requests to an unknown route
