@@ -9,7 +9,6 @@ personal_information:
   phone_prefix: "[Your Phone Prefix]"
   phone: "[Your Phone Number]"
   email: "[Your Email Address]"
-  github: "[Your GitHub Profile URL]"
   linkedin: "[Your LinkedIn Profile URL]"
 
 education_details:
