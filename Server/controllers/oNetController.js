@@ -14,7 +14,6 @@ oNetController.getJobListings = async (req, res, next) => {
   console.log('⚒️ Fetching Job Listings from O*NET API');
 
   try {
-    // TODO: Switch this API call to a sql query to our supabase. We already have the full occupation list.
     const response = await axios.get(
       `${ONET_API_BASE_URL}online/occupations/`,
       {
