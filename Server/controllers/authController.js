@@ -54,4 +54,21 @@ authController.login = async (req, res, next) => {
   }
 };
 
+authController.checkAuthStatus = async (req, res, next) => {
+  // Define a function checkSSID that takes a list of available SSIDs and a target SSID to check against.
+
+  // Inside the function:
+  
+  // Loop through each SSID in the list.
+  // Compare the current SSID with the target SSID.
+  // If a match is found, return true.
+  // If the loop completes without finding a match, return false.
+  // Define another function scanForSSIDs that simulates retrieving available SSIDs:
+  
+  // Create a list of sample SSIDs.
+  // Call checkSSID with the list and a given target SSID.
+  // Print whether the target SSID is found or not.
+  // Execute the scanForSSIDs function to perform the check.
+};
+
 module.exports = authController;
