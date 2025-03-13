@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "diffsum": "^1.0.25",
+    "@supabase/supabase-js": "^2.49.1",
+    "diffsum": "^1.1.0",
     "dotenv": "^16.4.7",
     "mongoose": "^8.12.1"
   }
