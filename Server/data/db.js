@@ -3,10 +3,11 @@ import mongoose from "mongoose";
 import dotenv from "dotenv";
 dotenv.config();
 
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
+// Will uncomment these later once the supabase SQL database is configured.
+// const supabaseUrl = process.env.SUPABASE_URL;
+// const supabaseKey = process.env.SUPABASE_KEY;
 
-export const supabase = createClient(supabaseUrl, supabaseKey);
+// export const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 // ------------ << MONGO DATABASE for RESUMES>> --------------
