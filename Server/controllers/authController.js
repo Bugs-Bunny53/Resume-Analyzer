@@ -45,7 +45,7 @@ authController.login = async (req, res, next) => {
       expiresIn: "0.5hr",
     });
 
-    res.status(200).json({ message: "loged in ", token });
+    res.status(200).json({ message: "logged in ", token });
 
     return next();
   } catch (error) {

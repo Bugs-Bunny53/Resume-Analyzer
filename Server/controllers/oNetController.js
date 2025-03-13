@@ -15,7 +15,7 @@ oNetController.getJobListings = (req, res, next) => {
       }
       res.locals.titles = result.rows;
     })
-    .then(next())
+    .then(() => next())
     .catch((error) => {
       return next({
         log: 'Shit went sideways in the SQL request for job listings...',
@@ -37,7 +37,7 @@ oNetController.getJobDetails = (req, res) => {
       }
       res.locals.details = result.rows;
     })
-    .then(next())
+    .then(() => next())
     .catch((error) => {
       return next({
         log: 'Shit went sideways in the SQL request for job listings...',

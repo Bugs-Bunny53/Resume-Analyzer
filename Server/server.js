@@ -2,6 +2,10 @@ import express, { json } from 'express';
 const app = express();
 const PORT = 3000;
 
+// Connect to the Mongo DB on server start
+import connectDB from "./data/db.js";
+connectDB();
+
 /**
  * require routers
  */
