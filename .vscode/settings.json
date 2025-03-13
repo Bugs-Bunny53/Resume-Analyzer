@@ -1,3 +1,4 @@
 {
-  "cSpell.words": ["njsproj", "ntvs", "SUPABASE"]
+  "cSpell.words": ["njsproj", "ntvs", "SUPABASE"],
+  "postman.settings.dotenv-detection-notification-visibility": false
 }
