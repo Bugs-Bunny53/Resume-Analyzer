@@ -67,12 +67,28 @@ sed do eiusmod tempor incididunt
     }
   };
 
+  const onJobSelect = (job) => {
+    //here we will post to the AI endpoint with the job
+    /*
+    fetch(API), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(job)
+  })
+    .then(response => response.json())
+    .then(data => )
+    .catch(error => console.log('error posting job:', error));
+    */
+    console.log('selected:', job);
+  };
+
   return (
     <div className='dashboard'>
       <Toolbar
         onResumeUpdate={handleResumeUpdate}
         onUploadResume={handleUploadResume}
         jobListings={jobListings}
+        onJobSelect={onJobSelect}
       />
       <div className='dashboard-content'>
         {pdfUrl ? (
