@@ -1,12 +1,11 @@
 // src/components/Dashboard/AnalysisPanel.jsx
 import React, { useState } from 'react';
 
-const AnalysisPanel = ({ analysisData, onCategoryClick }) => {
+const AnalysisPanel = ({ analysisData }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const handleCategorySelect = (item) => {
     setSelectedCategoryId(item.id);
-    onCategoryClick(item.highlightedLines);
   };
 
   return (

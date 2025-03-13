@@ -11,19 +11,9 @@ const Dashboard = () => {
   const location = useLocation();
   const jobListings = location.state?.jobListings || [];
 
-  const [resumeText, setResumeText] = useState(`
-Lorem ipsum dolor sit amet,
-consectetur adipiscing elit,
-sed do eiusmod tempor incididunt
-ut labore et dolore magna aliqua.
-Lorem ipsum dolor sit amet,
-consectetur adipiscing elit,
-sed do eiusmod tempor incididunt
-ut labore et dolore magna aliqua.
-Lorem ipsum dolor sit amet,
-consectetur adipiscing elit,
-sed do eiusmod tempor incididunt
-`);
+  const [resumeText, setResumeText] = useState(
+    `Upload or paste resume to get your results!`
+  );
   const [pdfUrl, setPdfUrl] = useState(null);
   const [analysisData, setAnalysisData] = useState([
     {

@@ -79,8 +79,7 @@ const Splash = () => {
       <p className='description'>
         Welcome to ResumeReview – your AI-powered career companion. We're
         analyzing your resume and matching your skills with the best job
-        opportunities. Sit tight as we prepare personalized insights to help you
-        shine in your next interview.
+        opportunities.
       </p>
     </div>
   );
