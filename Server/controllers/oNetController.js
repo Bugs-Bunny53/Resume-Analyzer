@@ -13,6 +13,7 @@ oNetController.getJobListings = async (req, res, next) => {
   console.log('⚒️ Fetching Job Listings from O*NET API');
 
   try {
+    // TODO: Switch this API call to a sql query to our supabase. We already have the full occupation list.
     const response = await axios.get(`${ONET_API_BASE_URL}online/occupations/`, {
       headers: {
         'X-API-Key': ONET_API_KEY,
@@ -36,13 +37,14 @@ oNetController.getJobListings = async (req, res, next) => {
   }
 };
 
-// Function to fetch job details from O*NET
+// Function to fetch job details from O*NET by job code
 oNetController.getJobDetails = async (req, res, next) => {
   console.log('🕵️ Fetching Job Details from O*NET API');
-  const { title } = req.params;
+
+  const { code } = req.params; // Extract job code from request params
 
   try {
-    const response = await axios.get(`${ONET_API_BASE_URL}find/${title}`, {
+    const response = await axios.get(`${ONET_API_BASE_URL}online/occupations/${code}`, {
       headers: {
         'X-API-Key': ONET_API_KEY,
         'Accept': 'application/json'
@@ -50,7 +52,7 @@ oNetController.getJobDetails = async (req, res, next) => {
     });
 
     if (!response.data) {
-      throw new Error('No details found for this job title.');
+      throw new Error('No details found for this job code.');
     }
 
     res.status(200).json(response.data);
