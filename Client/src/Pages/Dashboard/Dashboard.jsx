@@ -5,6 +5,7 @@ import ResumeViewer from './ResumeViewer';
 import PDFViewer from './PDFViewer';
 import AnalysisPanel from './AnalysisPanel';
 import './Dashboard.css';
+import DocxToHtml from './DocxToHtml';
 
 const Dashboard = () => {
   //splash will pass the job listings here
@@ -15,6 +16,7 @@ const Dashboard = () => {
     `Upload or paste resume to get your results!`
   );
   const [pdfUrl, setPdfUrl] = useState(null);
+  const [wordFile, setWordFile] = useState(null);
   const [analysisData, setAnalysisData] = useState([
     {
       id: 1,
@@ -41,11 +43,19 @@ const Dashboard = () => {
   //think we need cases for all types of files in here
   const handleUploadResume = (file) => {
     console.log(`Uploading file: ${file.name}`);
+    setPdfUrl(null);
+    setWordFile(null);
+    setResumeText('');
     // Check if the file is a PDF
     if (file.type === 'application/pdf') {
       // Create a URL for the PDF file
       const fileUrl = URL.createObjectURL(file);
       setPdfUrl(fileUrl);
+    } else if (
+      file.type ===
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ) {
+      setWordFile(file);
     } else {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -72,6 +82,17 @@ const Dashboard = () => {
     console.log('selected:', job);
   };
 
+  //here we render the right viewer
+  const renderViewer = () => {
+    if (pdfUrl) {
+      return <PDFViewer pdfUrl={pdfUrl} />;
+    } else if (wordFile) {
+      return <DocxToHtml file={wordFile} />;
+    } else {
+      return <ResumeViewer resumeText={resumeText} />;
+    }
+  };
+
   return (
     <div className='dashboard'>
       <Toolbar
@@ -81,15 +102,10 @@ const Dashboard = () => {
         onJobSelect={onJobSelect}
       />
       <div className='dashboard-content'>
-        {pdfUrl ? (
-          <PDFViewer pdfUrl={pdfUrl} />
-        ) : (
-          <ResumeViewer resumeText={resumeText} />
-        )}
+        {renderViewer()}
         <AnalysisPanel analysisData={analysisData} />
       </div>
     </div>
   );
 };
-
 export default Dashboard;
