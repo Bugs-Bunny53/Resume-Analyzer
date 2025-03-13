@@ -24,8 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 /**
  * define route handlers`
  */
-app.use('/job-titles', (req, res, next) => {
-  console.log('🤝 Incoming request for Job Data!');
+app.use('/job', (req, res, next) => {
+  console.log('🤝 Incoming request for Job Titles!');
   oNetRouter(req, res, next);
 });
 
