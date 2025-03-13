@@ -6,6 +6,7 @@ const router = express.Router();
 const upload = multer({ dest: "uploads/" });
 
 // * Router to handle uploads
-router.post("/", upload.single("resume"), uploadController.processUpload);
+//  removing multer so we can test upload.single("resume"),
+router.post("/", uploadController.processUpload);
 
 export default router;

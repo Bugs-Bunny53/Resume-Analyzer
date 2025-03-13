@@ -1,7 +1,8 @@
 import fs from 'fs/promises';
 import yaml from 'js-yaml';
 import { extractTextFromFile } from '../utils/extractTextFromFile.js';
-import convertTextToYAML from '../utils/convertTextToYAML.js';
+import generateYAMLWithAI from '../utils/convertTextToYAML.js';
+import YAMLModel from '../models/YAMLModel.js';
 
 const uploadController = {};
 
@@ -16,36 +17,74 @@ uploadController.processUpload = async (req, res, next) => {
 
   const { path, mimetype } = req.file;
 
-  extractTextFromFile(path, mimetype)
-    .then((extractedText) => {
+try {
+  const extractedText = await extractTextFromFile(path, mimetype);
+
+  const yamlData = await generateYAMLWithAI(extractedText);  
+  console.log("✅ AI-Generated YAML:", yamlData);
+  const yamlString = yaml.dump(yamlData); 
+
+  const savedData = await YAMLModel.create(yamlData);
+
+  //const { path, mimetype } = req.file;
+
+  // const path = '/home/msymeonoglou/project/Projects/AI_Project/Resume-Analyzer/Resume-Analyzer/Server/uploads/test.txt'
+  // const mimetype = 'text/plain'
+
+  // await extractTexted(path, mimetype)
+  //   .then(async (extractedText) => {
       // Convert extracted text to YAML format
-      const yamlData = convertTextToYAML(extractedText);
-      const yamlString = yaml.dump(yamlData);
+      // const yamlData = convertTextToYAML(extractedText)
+      // const yamlData = await generateYAMLWithAI(extractedText);
+      // const yamlString = yaml.dump(yamlData);
 
       // Save YAML data to MongoDB
-      return YAMLModel.create(yamlData).then((savedData) => ({
-        yamlString,
-        savedData,
-      }));
-    })
+    //   return YAMLModel.create(yamlData).then((savedData) => ({
+    //     yamlString,
+    //     savedData,
+    //   }));
+    // })
     // TODO: Not sure this is what should be sent back, since the AI response is actually what we need.
     // Send an all clear response back
-    .then((savedData) => {
-      res.json({
-        message: "Resume processed and stored successfully",
-        id: savedData._id,
-        yaml: savedData,
-      });
-    })
-    // Catch errors
-    .catch((error) => {
-      console.error("❌ Error in processUpload:", error);
-      res.status(500).json({ error: error.message });
-    })
-    // Remove the file from uploads
-    .finally(() => {
-      fs.unlink(path).catch((err) => console.error("Error deleting file:", err));
+    // .then((savedData) => {
+    //   res.json({
+    //     message: "Resume processed and stored successfully",
+    //     id: savedData._id,
+    //     yaml: savedData,
+    //   });
+    // })
+    res.json({
+      message: "Resume processed and stored successfully",
+      id: savedData._id,
+      yaml: savedData,  // Respond with the stored YAML data
     });
+  } catch (error) {
+    // Handle any errors that occur during processing
+    console.error("❌ Error in processUpload:", error);
+    res.status(500).json({ error: error.message });
+  } finally {
+    // Optionally, remove the file after processing to clean up (this part is commented out for now)
+     fs.unlink(path).catch((err) => console.error("Error deleting file:", err));
+  }
 };
+    
+//     res.json({
+//       message: "Resume processed and stored successfully",
+//       id: savedData._id,
+//       yaml: savedData,  // Respond with the stored data
+//     });
+  
+//       // Catch errors
+//      .catch((error) => {
+//       console.error("❌ Error in processUpload:", error);
+//        res.status(500).json({ error: error.message });
+       
+//     })
+//     // Remove the file from uploads
+//     // .finally(() => {
+//     //   fs.unlink(path).catch((err) => console.error("Error deleting file:", err));
+//     // });
+ 
+// };
 
 export default uploadController;
