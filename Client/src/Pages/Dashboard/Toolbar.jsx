@@ -23,10 +23,6 @@ const Toolbar = ({
     }
   };
 
-  // Debugging: Ensure props are passed correctly
-  console.log('Job Listings in Toolbar:', jobListings); // Check if jobListings is passed correctly
-  console.log('onJobSelect function in Toolbar:', onJobSelect); // Check if onJobSelect is passed correctly
-
   return (
     <div className='toolbar'>
       <div className='toolbar-left'>
