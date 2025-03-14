@@ -26,7 +26,7 @@ oNetController.getJobDetails = (req, res, next) => {
   console.log('🕵️ Fetching Job Details from O*NET API');
 
   // Extract job code from request params
-  const { code } = req.params;
+  const code  = file.onetsoc_code;
   // Store all fetched data here
   const jobDetails = { code };
 
