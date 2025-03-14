@@ -1,25 +1,25 @@
 import express, { json } from 'express';
+
 const app = express();
 const PORT = 3000;
 
 // Connect to the Mongo DB on server start
-import connectDB from "./data/db.js";
+import connectDB from './data/db.js';
 connectDB();
 
 /**
  * require routers
  */
 import oNetRouter from './routes/oNetRouter.js';
-import authRouter from './routes/authRouter.js'
-import dataRouter from './routes/dataRouter.js'
-import uploadRouter from './routes/uploadRouter.js'
+import authRouter from './routes/authRouter.js';
+import dataRouter from './routes/dataRouter.js';
+import uploadRouter from './routes/uploadRouter.js';
 
 /**
  * handle parsing request body
  */
 app.use(json());
 app.use(express.urlencoded({ extended: true }));
-
 
 /**
  * define route handlers`
@@ -29,9 +29,9 @@ app.use('/job', (req, res, next) => {
   oNetRouter(req, res, next);
 });
 
-app.use("/upload", (req, res, next) => {
+app.use('/upload', (req, res, next) => {
   console.log('📜 Incoming resume upload!');
-  uploadRouter(req, res, next)
+  uploadRouter(req, res, next);
 });
 
 app.use('/', (req, res, next) => {

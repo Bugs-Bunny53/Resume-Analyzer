@@ -31,11 +31,8 @@ uploadController.processUpload = async (req, res, next) => {
     // TODO: Not sure this is what should be sent back, since the AI response is actually what we need.
     // Send an all clear response back
     .then((savedData) => {
-      res.json({
-        message: "Resume processed and stored successfully",
-        id: savedData._id,
-        yaml: savedData,
-      });
+      res.locals.yamlResume = savedData,
+      next()
     })
     // Catch errors
     .catch((error) => {

@@ -52,8 +52,8 @@ oNetController.getJobDetails = (req, res, next) => {
   JobDetail.findOne({ code }).then((existingJob) => {
     if (existingJob) {
       console.log('🥵 Cache Hit!');
-      //TODO: I dont think we actually want to send back the response here, we need to pass this to the AI evaluation Step.
-      return res.status(200).json(existingJob);
+      res.locals.jobQuery = existingJob;
+      next();
     }
 
     // If we don't find it in the cache, we go ask for it.
@@ -122,7 +122,8 @@ oNetController.getJobDetails = (req, res, next) => {
       })
       .then((response) => {
         jobDetails.professional_associations = response.data;
-        res.status(200).json(jobDetails);
+        res.locals.jobQuery = jobDetails;
+        next();
         return JobDetail.create(jobDetails);
       })
       .catch((error) => {
