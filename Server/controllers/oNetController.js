@@ -1,6 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import JobDetail from '../models/JobModel.js';
+import  query  from '../data/db.js';
 dotenv.config();
 
 const oNetController = {};
@@ -12,31 +13,38 @@ const ONET_API_KEY = process.env.ONET_API_KEY; // Ensure this is set in your .en
 // Function to fetch job titles from O*NET
 oNetController.getJobListings = async (req, res, next) => {
   console.log('⚒️ Fetching Job Listings from O*NET API');
+// using query from the SQL database
+// const sqlQueryText = 'SELECT title, onetsoc_code FROM occupation_data'
+const result = await query()
+console.log(result)
+res.locals.sqlQueryText = result
+return next()
 
-  try {
-    const response = await axios.get(
-      `${ONET_API_BASE_URL}online/occupations/`,
-      {
-        headers: {
-          'X-API-Key': ONET_API_KEY,
-          Accept: 'application/json',
-        },
-      }
-    );
+// query for the ONET API that currently returns paginated data. Above is the direct query for everything from our supabase.
+  // try {
+  //   const response = await axios.get(
+  //     `${ONET_API_BASE_URL}online/occupations/`,
+  //     {
+  //       headers: {
+  //         'X-API-Key': ONET_API_KEY,
+  //         Accept: 'application/json',
+  //       },
+  //     }
+  //   );
 
-    if (!response.data || !response.data.occupation) {
-      throw new Error('No job listings found.');
-    }
+  //   if (!response.data || !response.data.occupation) {
+  //     throw new Error('No job listings found.');
+  //   }
 
-    res.status(200).json(response.data.occupation);
-  } catch (error) {
-    console.error('❌ Error fetching job listings from O*NET:', error.message);
-    return next({
-      log: 'Error fetching job listings from O*NET API',
-      status: 500,
-      message: { err: error.message },
-    });
-  }
+  //   res.status(200).json(response.data.occupation);
+  // } catch (error) {
+  //   console.error('❌ Error fetching job listings from O*NET:', error.message);
+  //   return next({
+  //     log: 'Error fetching job listings from O*NET API',
+  //     status: 500,
+  //     message: { err: error.message },
+  //   });
+  // }
 };
 
 // Function to fetch job details from O*NET by job code
