@@ -6,16 +6,14 @@ dotenv.config();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-console.log();
 
 const openAiController = {};
 
 openAiController.analyzeContent = async (req, res, next) => {
-
-  
-  const yamlResume = res.locals.yamlResume;
+  const yamlResume = JSON.parse(res.locals.yamlResume);
   const jobQueryData = res.locals.jobQuery;
   console.log('✅ Incoming YAML format: ', yamlResume);
+  // console.log('✅ Incoming jobQueryData: ', jobQueryData);
 
   // ------------<< PARSED RESUME YAML SHIT >>------------------
   const personalInformation = {
@@ -27,8 +25,8 @@ openAiController.analyzeContent = async (req, res, next) => {
 
   const educationDetails = yamlResume.education_details;
 
-  const experienceDetails = yamlResume.experience_details
-
+  const experienceDetails = yamlResume.experience_details;
+  console.log(experienceDetails);
   const showcaseDetails = {
     projects: yamlResume.projects,
     achievements: yamlResume.achievements,
@@ -76,6 +74,11 @@ openAiController.analyzeContent = async (req, res, next) => {
     description: interest.description,
   }));
 
+  console.log('✅ Incoming jobQueryData: ', jobInformation);
+  console.log('✅ Incoming jobQueryData: ', workDetails);
+  console.log('✅ Incoming jobQueryData: ', skillsAndTools);
+  console.log('✅ Incoming jobQueryData: ', professionalAssociations);
+  console.log('✅ Incoming jobQueryData: ', interests);
   // ------------<< PROMPT CONSTRUCTION >>------------------
   const comparisonSections = {
     experienceDetails: {
@@ -222,104 +225,4 @@ openAiController.analyzeContent = async (req, res, next) => {
   });
 };
 
-/*
-  const prompt = `
-    Using the provided YAML resume (which follows the above structure) and the job details below, please analyze the resume and output a structured analysis as valid JSON. All keys aside from overallAssessment will contain an numerical % "grade" that demonstrates the quality of each "category" of the resume analysis.
-    The JSON object should have the following keys:
-    - overallAssessment: A brief summary of the candidate's overall suitability.
-    - grade: a numerical value which demonstrates how likely an applicant is to pass the check
-    - completeness: An object that comments on any missing information or well-detailed sections.
-    - experienceRelevance: An object that analyzes how the candidate's experience matches the job requirements, including any gaps.
-    - skillMatch: An object detailing the candidate's technical and soft skills along with any gaps.
-    - redFlags: An array listing potential issues (e.g., frequent job changes, gaps in employment).
-    - formattingAndClarity: An object assessing the resume's presentation and clarity.
-    - recommendations: An array of specific suggestions for improvements.
-
-    Below is an example output:
-
-    {
-    "overallAssessment": "The resume demonstrates a strong technical background but could be improved in clarity and organization.",
-    "completeness": {
-        "grade": 90
-        "missingInformation": ["LinkedIn URL", "Certifications"],
-        "adequateDetails": ["Detailed education history", "Clear employment dates"]
-    },
-    "experienceRelevance": {
-        "grade": 93
-        "relevantExperience": ["Software development", "Agile project management"],
-        "experienceGaps": ["Limited leadership roles", "Minimal cloud experience"]
-    },
-    "skillMatch": {
-        "grade": 96   
-        "technicalSkills": ["JavaScript", "React", "Node.js"],
-        "softSkills": ["Communication", "Teamwork"],
-        "skillGaps": ["Data analysis", "DevOps expertise"]
-    },
-    "redFlags": {
-        "grade": 90  
-        details: ["Frequent job changes", "Gaps longer than 6 months"]
-    },
-    "formattingAndClarity": {
-        "grade": 90  
-        "strengths": ["Clear section headers", "Consistent formatting"],
-        "areasForImprovement": ["Improve layout", "Standardize date formats"]
-    },
-    "recommendations": [
-        "Include a professional summary.",
-        "Add measurable achievements for each role.",
-        "Consider reordering sections to highlight relevant skills."
-    ]
-    }
-
-    YAML Resume:
-    ${yamlResume}
-
-    Job Details:
-    ${JSON.stringify(jobDetails, null, 2)}
-
-    If there is a grade for overallAssessment, remove it.
-    `;
-
-  openai.chat.completions
-    .create({
-      model: 'gpt-4',
-      messages: [
-        { role: 'system', content: assistantContext },
-        { role: 'user', content: prompt },
-      ],
-      max_tokens: 600,
-      temperature: 0.7,
-    })
-    .then((response) => {
-      // Use response.data if available, otherwise use response itself.
-      const result = response.data || response;
-      console.log('Full API response:', result);
-      const output =
-        result.choices &&
-        result.choices[0].message &&
-        result.choices[0].message.content;
-      console.log('Output:', output);
-      let analysis;
-      try {
-        analysis = JSON.parse(output);
-      } catch (parseError) {
-        console.error(
-          'Error parsing GPT-4 response as JSON:',
-          parseError,
-          'Raw output:',
-          output
-        );
-        return res
-          .status(500)
-          .json({ error: 'Error parsing resume analysis.' });
-      }
-      res.locals.analysis = analysis;
-      next();
-    })
-    .catch((error) => {
-      console.error('Error in openAIAnalysisController:', error);
-      res.status(500).json({ error: 'Error processing resume analysis.' });
-    });
-};
-*/
 export default openAiController.analyzeContent;

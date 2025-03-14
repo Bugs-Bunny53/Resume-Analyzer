@@ -38,9 +38,9 @@ uploadController.processUpload = async (req, res, next) => {
     const yamlString = yaml.dump(yamlData);
     
     
-    res.locals.yamlResume = yamlString;
-    YAMLModel.create(yamlData);
-    next();
+    res.locals.yamlResume = yamlData;
+    // YAMLModel.create(yamlData);
+    return next();
 
   } catch (error) {
     console.error("❌ Error in processUpload:", error);

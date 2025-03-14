@@ -164,10 +164,10 @@ personal_information:
     });
 
     // Debugging: Log the full API response
-    console.log('📝 Full API Response:', response.choices[0].message);
+    console.log('📝 Full API Response:', response.choices[0].message.content);
 
     // Ensure AI response is in JSON format
-    const parsedResponse = response.choices[0].message;
+    const parsedResponse = response.choices[0].message.content;
 
     // console.log('✅ AI Generated YAML Data:', parsedResponse);
 

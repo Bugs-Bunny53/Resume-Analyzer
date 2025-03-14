@@ -37,7 +37,7 @@ oNetController.getJobDetails = (req, res, next) => {
     if (existingJob) {
       console.log('🥵 Cache Hit!');
       res.locals.jobQuery = existingJob;
-      next();
+      return next();
     }
 
     // If we don't find it in the cache, we go ask for it.
@@ -107,16 +107,12 @@ oNetController.getJobDetails = (req, res, next) => {
       .then((response) => {
         jobDetails.professional_associations = response.data;
         res.locals.jobQuery = jobDetails;
-        next();
-        return JobDetail.create(jobDetails);
+        JobDetail.create(jobDetails);
+        return next();
       })
       .catch((error) => {
         console.error('❌ Error fetching job details:', error.message);
-        next({
-          log: 'Error fetching job details from O*NET API',
-          status: 500,
-          message: { err: error.message },
-        });
+        return next();
       });
   });
 };
