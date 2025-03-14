@@ -1,127 +1,199 @@
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
-import yaml from 'js-yaml';
+
 dotenv.config();
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
+console.log()
 
-const expectedYamlStructure = `
-    personal_information:
-    name: String
-    surname: String
-    date_of_birth: String
-    country: String
-    city: String
-    address: String
-    zip_code: String
-    phone_prefix: String
-    phone: String
-    email: String
-    github: String
-    linkedin: String
-    education_details:
-    - education_level: String
-        institution: String
-        field_of_study: String
-        final_evaluation_grade: String
-        start_date: String
-        year_of_completion: String
-    experience_details:
-    - position: String
-        company: String
-        employment_period: String
-        location: String
-        industry: String
-        key_responsibilities: [String]
-        skills_acquired: [String]
-    projects:
-    - name: String
-        description: String
-        link: String
-    achievements:
-    - name: String
-        description: String
-    certifications:
-    - name: String
-        description: String
-    languages:
-    - language: String
-        proficiency: String
-    interests: [String]
-    availability:
-    notice_period: String
-    salary_expectations:
-    salary_range_usd: String
-    self_identification:
-    gender: String
-    pronouns: String
-    veteran: String
-    disability: String
-    ethnicity: String
-    legal_authorization:
-    eu_work_authorization: String
-    us_work_authorization: String
-    requires_us_visa: String
-    requires_us_sponsorship: String
-    requires_eu_visa: String
-    legally_allowed_to_work_in_eu: String
-    legally_allowed_to_work_in_us: String
-    requires_eu_sponsorship: String
-    canada_work_authorization: String
-    requires_canada_visa: String
-    legally_allowed_to_work_in_canada: String
-    requires_canada_sponsorship: String
-    uk_work_authorization: String
-    requires_uk_visa: String
-    legally_allowed_to_work_in_uk: String
-    requires_uk_sponsorship: String
-    work_preferences:
-    remote_work: String
-    in_person_work: String
-    open_to_relocation: String
-    willing_to_complete_assessments: String
-    willing_to_undergo_drug_tests: String
-    willing_to_undergo_background_checks: String
-    `;
+const openAiController = {}
 
-export const openAIAnalysisController = (req, res, next) => {
-  // Use the resume object provided in the request body if no YAML version is in res.locals.
-  let yamlResume;
-  if (res.locals.yamlResume) {
-    yamlResume = res.locals.yamlResume;
-  } else if (req.body.resume) {
-    try {
-      yamlResume = yaml.dump(req.body.resume);
-    } catch (err) {
-      console.error('Error converting resume to YAML:', err);
-      return res
-        .status(500)
-        .json({ error: 'Error converting resume to YAML.' });
+openAiController.analyzeContent = async (req, res, next) => {
+  const yamlResume = res.locals.yamlResume;
+  const jobQueryData = res.locals.jobQuery; 
+
+  // ------------<< PARSED RESUME YAML SHIT >>------------------
+  const personalInformation = {
+    personalInformation: yamlResume.personal_information,
+    availability: yamlResume.availability,
+    salaryExpectations: yamlResume.salary_expectations,
+    workPreferences: yamlResume.work_preferences,
+  };
+  
+  const educationDetails = yamlResume.education_details;
+  
+  const experienceDetails = yamlResume.experience_details.flatMap((exp) => ({
+    position: exp.position,
+    company: exp.company,
+    responsibilities: exp.key_responsibilities,
+    skills: exp.skills_acquired,
+  }));
+  
+  const showcaseDetails = {
+    projects: yamlResume.projects,
+    achievements: yamlResume.achievements,
+    certifications: yamlResume.certifications,
+    languages: yamlResume.languages,
+    interests: yamlResume.interests,
+  };
+  
+  const selfIdentification = yamlResume.self_identification;
+  const legalAuthorization = yamlResume.legal_authorization;
+
+  // ------------<< JOB QUERY RESPONSE SHIT >>------------------
+  const jobInformation = {
+    code: jobQueryData.code,
+    title: jobQueryData.main.title,
+    description: jobQueryData.main.description,
+    sampleTitles: jobQueryData.main.sample_of_reported_titles,
+    brightOutlook: jobQueryData.main.bright_outlook,
+    jobZone: jobQueryData.job_zone,
+    apprenticeship: jobQueryData.apprenticeship,
+  };
+
+  const workDetails = {
+    tasks: jobQueryData.tasks.task.map((task) => task.title),
+    activities: jobQueryData.detailed_work_activities.activity.map((activity) => activity.title),
+  };
+
+  const skillsAndTools = {
+    technologySkills: jobQueryData.technology_skills.category.flatMap((category) =>
+      category.example.map((example) => example.title)
+    ),
+    toolsUsed: jobQueryData.tools_used.category.flatMap((tool) => tool.example),
+  };
+
+  const professionalAssociations = jobQueryData.professional_associations.source.map((association) => ({
+    name: association.name,
+    url: association.url,
+  }));
+
+  const interests = jobQueryData.interests.element.map((interest) => ({
+    name: interest.name,
+    description: interest.description,
+  }));
+
+
+ // ------------<< PROMPT CONSTRUCTION >>------------------
+    const comparisonSections = {
+    experienceDetails: {
+      yaml: experienceDetails,
+      job: workDetails,
+      prompt:
+        "Compare the experience listed in this resume to the job's tasks and responsibilities. Highlight missing skills or qualifications.",
+    },
+    skillsAndTools: {
+      yaml: experienceDetails.flatMap((exp) => exp.skills),
+      job: {
+        technologySkills: skillsAndTools.technologySkills,
+        sampleTitles: jobInformation.sampleTitles,
+      },
+      prompt:
+        "Compare the candidate's skills to the required technologies for the job. What key skills are missing?",
+    },
+    professionalAssociations: {
+      yaml: showcaseDetails.certifications,
+      job: professionalAssociations,
+      prompt:
+        "Compare the candidate's certifications to the relevant professional associations in this job field. Highlight if additional certifications are recommended.",
+    },
+    interests: {
+      yaml: showcaseDetails.interests,
+      job: interests,
+      prompt:
+        "Compare the candidate’s interests to the job's interests. How well does the candidate's passion align?",
+    },
+    jobZoneComparison: {
+      yaml: {
+        education: educationDetails,
+        experience: experienceDetails.map(exp => ({ position: exp.position, company: exp.company })),
+      },
+      job: jobInformation.jobZone,
+      prompt:
+        "Compare the candidate's education and experience to the job zone requirements. Identify any gaps in training or qualifications.",
+    },    
+    relatedOccupations: {
+      yaml: experienceDetails.map(exp => exp.position),
+      job: jobQueryData.main.related_occupations || [],
+      prompt:
+        "If the candidate's experience does not fully align with the job requirements, suggest alternative related occupations they might be qualified for.",
+    },
+    inDemandTechnologies: {
+      yaml: experienceDetails.flatMap(exp => exp.skills),
+      job: skillsAndTools.technologySkills.filter(skill => skill.hot_technology === true),
+      prompt:
+        "Compare the candidate's skills to the list of hot technologies in demand for this role. Identify key technologies they should learn to remain competitive.",
+    },
+    remainingInfo: {
+      yaml: {
+        personalInformation, 
+        selfIdentification, 
+        legalAuthorization
+      },
+      job: jobInformation,
+      prompt:
+        "Review the remaining information for the candidate, compare their self identification, legal authorization, and personal information to the job description. Highlight any discrepancies that might exist.",
+    },
+  };
+
+  // ------------<< MAKE API CALLS IN PARALLEL >>------------------
+  const apiCalls = Object.entries(comparisonSections).map(async ([section, data]) => {
+    if (!data.yaml || !data.job || data.yaml.length === 0 || data.job.length === 0) {
+      console.warn(`Skipping ${section}: Missing relevant data`);
+      return { section, feedback: { score: 0, body: "Skipped due to missing data." } };
     }
-  } else {
-    return res.status(400).json({ error: 'No resume provided.' });
-  }
+  
+    const prompt = `
+      You are an AI resume evaluator. Your task is to compare the resume information to the job posting and provide **constructive feedback**.
+      \n**Category: ${section.replace(/([A-Z])/g, " $1").trim()}**
+      \n**Resume Data:** ${JSON.stringify(data.yaml, null, 2)}
+      \n**Job Data:** ${JSON.stringify(data.job, null, 2)}
+      \n${data.prompt}
+      \nReturn your response **strictly in the following JSON format**:
+      {
+        "score": 0-100,
+        "body": "Detailed feedback here."
+      }
+    `;
+  
+    console.log(`🔵 Sending request to OpenAI for section: ${section}`);
+  
+    try {
+      const response = await openai.chat.completions.create({
+        model: "gpt-4",
+        messages: [
+          { role: "system", content: "You are an AI assistant that compares resumes to job postings and provides structured feedback in JSON format." },
+          { role: "user", content: prompt },
+        ],
+        temperature: 0.7,
+      });
+  
+      const rawResponse = response.choices?.[0]?.message?.content;
+      console.log(`🟢 OpenAI Response for ${section}:`, rawResponse);
+  
+      let structuredFeedback;
+      try {
+        structuredFeedback = JSON.parse(rawResponse);
+      } catch (jsonError) {
+        console.error(`❌ Error parsing JSON response for ${section}:`, jsonError);
+        structuredFeedback = { score: 0, body: "Invalid JSON response from AI." };
+      }
+  
+      return { section, feedback: structuredFeedback };
+    } catch (apiError) {
+      console.error(`❌ OpenAI API error for section ${section}:`, apiError);
+      return { section, feedback: { score: 0, body: "OpenAI request failed." } };
+    }
+  });
 
-  // Use provided job details from req.body or set a dummy object.
-  let jobDetails;
-  if (res.locals.jobDetails) {
-    jobDetails = res.locals.jobDetails;
-  } else if (req.body.jobDetails) {
-    jobDetails = req.body.jobDetails;
-  } else {
-    // Dummy job details for testing
-    jobDetails = {
-      occupation: 'Software Engineer',
-      description: 'Designs, develops, and maintains software systems.',
-      requirements: ['JavaScript', 'React', 'Node.js'],
-    };
-  }
+  // Wait for all API responses
+  const results = await Promise.all(apiCalls);
+  res.json({ feedback: Object.fromEntries(results.map(({ section, feedback }) => [section, feedback])) });
+};
 
-  // Build a context message that includes the expected YAML structure.
-  const assistantContext = `The expected YAML structure for resumes is as follows:${expectedYamlStructure}`;
-
+/*
   const prompt = `
     Using the provided YAML resume (which follows the above structure) and the job details below, please analyze the resume and output a structured analysis as valid JSON. All keys aside from overallAssessment will contain an numerical % "grade" that demonstrates the quality of each "category" of the resume analysis.
     The JSON object should have the following keys:
@@ -220,5 +292,5 @@ export const openAIAnalysisController = (req, res, next) => {
       res.status(500).json({ error: 'Error processing resume analysis.' });
     });
 };
-
-export default openAIAnalysisController;
+*/
+export default openAiController.analyzeContent;
