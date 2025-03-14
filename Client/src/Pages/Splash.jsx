@@ -13,7 +13,7 @@ const Splash = () => {
         const response = await fetch('http://localhost:3000/job/titles');
         const data = await response.json();
         const formattedJobs = data.map((job) => ({
-          code: job.code,
+          onetsoc_code: job.onetsoc_code,
           title: job.title,
         }));
 

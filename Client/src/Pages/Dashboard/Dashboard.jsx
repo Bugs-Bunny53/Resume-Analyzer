@@ -52,16 +52,15 @@ const Dashboard = () => {
   };
 
   const onJobSelect = (job) => {
-    console.log('Selected job in Dashboard:', job); // Debugging: Check if job is selected
+    console.log(job);
     setSelectedJob(job);
   };
 
   useEffect(() => {
-    console.log('Selected Job:', selectedJob); // Log selected job for debugging
     if (isResumeUploaded && selectedJob) {
       console.log('Posting job:', selectedJob);
       const formData = new FormData();
-      formData.append('jobCode', selectedJob.code);
+      formData.append('onetsoc_code', selectedJob.onetsoc_code);
 
       if (resumeText) {
         formData.append('resumeText', resumeText);
@@ -71,6 +70,7 @@ const Dashboard = () => {
       } else if (wordFile) {
         formData.append('resumeFile', wordFile);
       }
+      console.log(formData);
       fetch('http://localhost:3000/upload', {
         method: 'POST',
         body: formData,
