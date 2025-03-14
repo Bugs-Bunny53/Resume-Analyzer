@@ -72,23 +72,33 @@
 
 /* Analysis Panel (Right Pane) */
 .analysis-panel {
-  width: 67%;
-  padding: 1rem;
-  overflow-y: auto;
-  background-color: #fafafa;
+  padding: 20px;
 }
 
-/* Analysis Items */
 .analysis-item {
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 0.5rem;
-  margin-bottom: 0.5rem;
+  padding: 10px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
   cursor: pointer;
 }
 
 .analysis-item.active {
-  background-color: #e6f0ff;
+  background-color: #f0f8ff;
+}
+
+.analysis-category {
+  font-weight: bold;
+}
+
+.analysis-score {
+  margin-left: 10px;
+  color: green;
+}
+
+.analysis-details {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
 }
 
 /* Resume Viewer Specific Styles */

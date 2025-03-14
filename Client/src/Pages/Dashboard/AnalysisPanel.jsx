@@ -1,11 +1,10 @@
-// src/components/Dashboard/AnalysisPanel.jsx
 import React, { useState } from 'react';
 
 const AnalysisPanel = ({ analysisData }) => {
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const handleCategorySelect = (item) => {
-    setSelectedCategoryId(item.id);
+    setSelectedCategoryId(item.id); // Toggle between active/inactive state
   };
 
   return (
@@ -21,10 +20,11 @@ const AnalysisPanel = ({ analysisData }) => {
           >
             <div className='analysis-category'>
               <strong>{item.category}</strong>
+              <span className='analysis-score'>Score: {item.score}</span>
             </div>
             {isActive && (
               <div className='analysis-details'>
-                <p>{item.details}</p>
+                <p>{item.body}</p>
               </div>
             )}
           </div>

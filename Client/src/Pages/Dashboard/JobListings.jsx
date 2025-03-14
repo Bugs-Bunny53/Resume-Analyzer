@@ -10,14 +10,11 @@ const JobListings = ({ onJobSelect, jobListings }) => {
     const results = jobListings.filter((job) => {
       return job.title.toLowerCase().includes(searchQuery.toLowerCase());
     });
-    console.log('Filtered Jobs:', results); // Debugging: Check filtered job list
     setFilteredJobs(results);
   }, [searchQuery, jobListings]);
 
   const handleSelect = (job) => {
-    console.log('handleSelect');
-    console.log('Job', job);
-    console.log('Job selected:', job); // This should log whenever a job is clicked
+    console.log('Job selected:', job.title); // This should log whenever a job is clicked
     setSearchQuery(job.title); // Update the search query with the selected job's title
     onJobSelect(job); // Notify the parent (Dashboard) with the selected job
   };
@@ -33,7 +30,7 @@ const JobListings = ({ onJobSelect, jobListings }) => {
       {filteredJobs.length > 0 && (
         <ul className='job-results'>
           {filteredJobs.map((job) => (
-            <li key={job.code} onClick={() => handleSelect(job)}>
+            <li key={job.onetsoc_code} onClick={() => handleSelect(job)}>
               {job.title}
             </li>
           ))}

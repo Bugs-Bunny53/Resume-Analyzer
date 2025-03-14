@@ -1,7 +1,7 @@
 import axios from 'axios';
 import dotenv from 'dotenv';
 import JobDetail from '../models/JobModel.js';
-import  query  from '../data/db.js';
+import {query} from '../data/db.js';
 dotenv.config();
 
 const oNetController = {};
@@ -13,46 +13,22 @@ const ONET_API_KEY = process.env.ONET_API_KEY; // Ensure this is set in your .en
 // Function to fetch job titles from O*NET
 oNetController.getJobListings = async (req, res, next) => {
   console.log('⚒️ Fetching Job Listings from O*NET API');
-// using query from the SQL database
-// const sqlQueryText = 'SELECT title, onetsoc_code FROM occupation_data'
-const result = await query()
-console.log(result)
-res.locals.sqlQueryText = result
-return next()
-
-// query for the ONET API that currently returns paginated data. Above is the direct query for everything from our supabase.
-  // try {
-  //   const response = await axios.get(
-  //     `${ONET_API_BASE_URL}online/occupations/`,
-  //     {
-  //       headers: {
-  //         'X-API-Key': ONET_API_KEY,
-  //         Accept: 'application/json',
-  //       },
-  //     }
-  //   );
-
-  //   if (!response.data || !response.data.occupation) {
-  //     throw new Error('No job listings found.');
-  //   }
-
-  //   res.status(200).json(response.data.occupation);
-  // } catch (error) {
-  //   console.error('❌ Error fetching job listings from O*NET:', error.message);
-  //   return next({
-  //     log: 'Error fetching job listings from O*NET API',
-  //     status: 500,
-  //     message: { err: error.message },
-  //   });
-  // }
+  // using query from the SQL database
+  const sqlQueryText = 'SELECT title, onetsoc_code FROM occupation_data'
+  const result = await query(sqlQueryText);
+  // console.log(yamlResume);
+  res.locals.sqlQueryText = result;
+  return res.status(200).json(res.locals.sqlQueryText)
 };
 
 // Function to fetch job details from O*NET by job code
 oNetController.getJobDetails = (req, res, next) => {
   console.log('🕵️ Fetching Job Details from O*NET API');
-
+  // console.log(res.locals)
+  // console.log(req.file)
+  console.log('REQUEST OBJECT: ', req.body.onetsoc_code)
   // Extract job code from request params
-  const { code } = req.params;
+  const code  = req.body.onetsoc_code;
   // Store all fetched data here
   const jobDetails = { code };
 
@@ -61,7 +37,7 @@ oNetController.getJobDetails = (req, res, next) => {
     if (existingJob) {
       console.log('🥵 Cache Hit!');
       res.locals.jobQuery = existingJob;
-      next();
+      return next();
     }
 
     // If we don't find it in the cache, we go ask for it.
@@ -131,16 +107,12 @@ oNetController.getJobDetails = (req, res, next) => {
       .then((response) => {
         jobDetails.professional_associations = response.data;
         res.locals.jobQuery = jobDetails;
-        next();
-        return JobDetail.create(jobDetails);
+        JobDetail.create(jobDetails);
+        return next();
       })
       .catch((error) => {
         console.error('❌ Error fetching job details:', error.message);
-        next({
-          log: 'Error fetching job details from O*NET API',
-          status: 500,
-          message: { err: error.message },
-        });
+        return next();
       });
   });
 };

@@ -1,10 +1,8 @@
 import { PDFDocument } from "pdf-lib";
-import docx4js from "docx4js";
-import fs from "fs/promises";
+import mammoth from 'mammoth'
 
-export const extractTextFromFile = async (filePath, mimeType) => {
-  const fileBuffer = await fs.readFile(filePath);
 
+export const extractTextFromFile = async (fileBuffer, mimeType) => {
   if (mimeType === "application/pdf") {
     try {
       const pdfDoc = await PDFDocument.load(fileBuffer);
@@ -18,14 +16,12 @@ export const extractTextFromFile = async (filePath, mimeType) => {
   }
 
   if (mimeType === "application/vnd.openxmlformats-officedocument.wordprocessingml.document") {
-    const doc = await docx4js.load(fileBuffer);
-    return doc.toString();
+    const doc = await mammoth.extractRawText({ buffer: fileBuffer });
+    return doc.value
   }
   if (mimeType === "text/plain"){
-
     return fileBuffer.toString("utf8");
   }
-    
 
   throw new Error("Unsupported file format");
 };
