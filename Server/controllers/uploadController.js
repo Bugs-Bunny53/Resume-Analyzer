@@ -37,7 +37,7 @@ try {
   console.log("✅ AI-Generated YAML:", yamlData);
   const yamlString = yaml.dump(yamlData); 
 
-  const savedData = await YAMLModel.create(yamlData);
+  const savedData = await YAMLModel.create(yamlData)
 
   //const { path, mimetype } = req.file;
 
@@ -72,6 +72,6 @@ try {
     .finally(() => {
       fs.unlink(path).catch((err) => console.error("Error deleting file:", err));
     });
-};
-
+}
+}
 export default uploadController;
