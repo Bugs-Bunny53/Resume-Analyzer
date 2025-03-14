@@ -99,7 +99,7 @@ const yamlSchema = new mongoose.Schema(
       legally_allowed_to_work_in_uk: String,
       requires_uk_sponsorship: String,
     },
-    work_preferences: {
+    work_preferences: { 
       remote_work: String,
       in_person_work: String,
       open_to_relocation: String,

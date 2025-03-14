@@ -37,21 +37,15 @@ uploadController.processUpload = async (req, res, next) => {
     
     const yamlString = yaml.dump(yamlData);
     
-    const savedData = await YAMLModel.create(yamlData);
-
-    res.locals.yamlResume = savedData;
+    
+    res.locals.yamlResume = yamlString;
+    YAMLModel.create(yamlData);
     next();
 
   } catch (error) {
     console.error("❌ Error in processUpload:", error);
     return res.status(500).json({ error: error.message });
-  } finally {
-    try {
-      await fs.unlink(path);
-    } catch (err) {
-      console.error("Error deleting file:", err);
-    }
-  }
+  } 
 };
 
 export default uploadController;

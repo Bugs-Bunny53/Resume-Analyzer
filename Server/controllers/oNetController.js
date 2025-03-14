@@ -16,7 +16,7 @@ oNetController.getJobListings = async (req, res, next) => {
   // using query from the SQL database
   const sqlQueryText = 'SELECT title, onetsoc_code FROM occupation_data'
   const result = await query(sqlQueryText);
-  console.log(result);
+  console.log(yamlResume);
   res.locals.sqlQueryText = result;
   return res.status(200).json(res.locals.sqlQueryText)
 };
@@ -24,9 +24,11 @@ oNetController.getJobListings = async (req, res, next) => {
 // Function to fetch job details from O*NET by job code
 oNetController.getJobDetails = (req, res, next) => {
   console.log('🕵️ Fetching Job Details from O*NET API');
-
+  // console.log(res.locals)
+  // console.log(req.file)
+  console.log('REQUEST OBJECT: ', req.body.onetsoc_code)
   // Extract job code from request params
-  const code  = file.onetsoc_code;
+  const code  = req.body.onetsoc_code;
   // Store all fetched data here
   const jobDetails = { code };
 
