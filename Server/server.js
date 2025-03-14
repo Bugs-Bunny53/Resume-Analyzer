@@ -34,28 +34,6 @@ app.use('/upload', (req, res, next) => {
   uploadRouter(req, res, next);
 });
 
-import openAIAnalysisController from './controllers/openAIController.js';
-app.post(
-  '/analyze/:code',
-  (req, res, next) => {
-    // For testing, we simulate job details.
-    res.locals.jobDetails = {
-      occupation: 'Software Engineer',
-      description: 'Designs, develops, and maintains software systems.',
-      // Add other relevant fields if necessary
-    };
-    next();
-  },
-  openAIAnalysisController, // produces analysis and stores it in res.locals.analysis
-  (req, res) => {
-    res.status(200).json({
-      analysis: res.locals.analysis,
-      yamlResume: res.locals.yamlResume,
-      jobDetails: res.locals.jobDetails,
-    });
-  }
-);
-
 app.use('/', (req, res, next) => {
   console.log('🫚 Incoming request for root!');
   authRouter(req, res, next);
