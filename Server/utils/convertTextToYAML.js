@@ -8,7 +8,10 @@ const openai = new OpenAI({
   apiKey: process.env.YAML_KEY,
 });
 
+
 export const generateYAMLWithAI = async (resumeText) => {
+  // console.log(resumeText)
+
   const systemMessage = `
 You are an expert at structuring resumes into YAML format. Given the following resume text, extract structured data and return it in JSON format.
 
@@ -134,28 +137,28 @@ personal_information:
         { role: 'system', content: systemMessage },
         { role: 'user', content: resumeText },
       ],
-      tools: [
-        {
-          type: 'function',
-          function: {
-            name: 'enforce_yaml_schema',
-            description:
-              'Validates and ensures schema constraints on the extracted resume data.',
-            parameters: {
-              type: 'object',
-              properties: {
-                yamlData: {
-                  type: 'object',
-                  description:
-                    'Structured resume data following the predefined schema.',
-                },
-              },
-              required: ['yamlData'],
-            },
-          },
-        },
-      ],
-      tool_choice: 'required',
+      // tools: [
+      //   {
+      //     type: 'function',
+      //     function: {
+      //       name: 'enforce_yaml_schema',
+      //       description:
+      //         'Validates and ensures schema constraints on the extracted resume data.',
+      //       parameters: {
+      //         type: 'object',
+      //         properties: {
+      //           yamlData: {
+      //             type: 'object',
+      //             description:
+      //               'Structured resume data following the predefined schema.',
+      //           },
+      //         },
+      //         required: ['yamlData'],
+      //       },
+      //     },
+      //   },
+      // ],
+      // tool_choice: 'required',
       response_format: { type: 'json_object' },
       temperature: 0.2,
     });
@@ -164,12 +167,11 @@ personal_information:
     console.log('📝 Full API Response:', response.choices[0].message);
 
     // Ensure AI response is in JSON format
-    const parsedResponse =
-      response.choices[0].message.tool_calls[0].function.arguments;
+    const parsedResponse = response.choices[0].message;
 
-    console.log('✅ AI Generated YAML Data:', parsedResponse);
+    // console.log('✅ AI Generated YAML Data:', parsedResponse);
 
-    return JSON.parse(parsedResponse);
+    return parsedResponse;
   } catch (error) {
     console.error('❌ Error generating YAML with AI:', error);
     throw new Error('Failed to generate YAML from AI.');

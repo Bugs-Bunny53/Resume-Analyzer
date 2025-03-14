@@ -11,8 +11,11 @@ console.log();
 const openAiController = {};
 
 openAiController.analyzeContent = async (req, res, next) => {
+
+  
   const yamlResume = res.locals.yamlResume;
   const jobQueryData = res.locals.jobQuery;
+  console.log('✅ Incoming YAML format: ', yamlResume);
 
   // ------------<< PARSED RESUME YAML SHIT >>------------------
   const personalInformation = {
@@ -24,12 +27,7 @@ openAiController.analyzeContent = async (req, res, next) => {
 
   const educationDetails = yamlResume.education_details;
 
-  const experienceDetails = yamlResume.experience_details.map((exp) => ({
-    position: exp.position,
-    company: exp.company,
-    responsibilities: exp.key_responsibilities,
-    skills: exp.skills_acquired,
-  }));
+  const experienceDetails = yamlResume.experience_details
 
   const showcaseDetails = {
     projects: yamlResume.projects,
@@ -87,7 +85,7 @@ openAiController.analyzeContent = async (req, res, next) => {
         "Compare the experience listed in this resume to the job's tasks and responsibilities. Highlight missing skills or qualifications.",
     },
     skillsAndTools: {
-      yaml: experienceDetails.flatMap((exp) => exp.skills),
+      yaml: experienceDetails,
       job: {
         technologySkills: skillsAndTools.technologySkills,
         sampleTitles: jobInformation.sampleTitles,
@@ -110,23 +108,20 @@ openAiController.analyzeContent = async (req, res, next) => {
     jobZoneComparison: {
       yaml: {
         education: educationDetails,
-        experience: experienceDetails.map((exp) => ({
-          position: exp.position,
-          company: exp.company,
-        })),
+        experience: experienceDetails,
       },
       job: jobInformation.jobZone,
       prompt:
         "Compare the candidate's education and experience to the job zone requirements. Identify any gaps in training or qualifications.",
     },
     relatedOccupations: {
-      yaml: experienceDetails.map((exp) => exp.position),
+      yaml: experienceDetails,
       job: jobQueryData.main.related_occupations || [],
       prompt:
         "If the candidate's experience does not fully align with the job requirements, suggest alternative related occupations they might be qualified for.",
     },
     inDemandTechnologies: {
-      yaml: experienceDetails.flatMap((exp) => exp.skills),
+      yaml: experienceDetails,
       job: skillsAndTools.technologySkills.filter(
         (skill) => skill.hot_technology === true
       ),

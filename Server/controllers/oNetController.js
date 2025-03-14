@@ -16,7 +16,7 @@ oNetController.getJobListings = async (req, res, next) => {
   // using query from the SQL database
   const sqlQueryText = 'SELECT title, onetsoc_code FROM occupation_data'
   const result = await query(sqlQueryText);
-  console.log(yamlResume);
+  // console.log(yamlResume);
   res.locals.sqlQueryText = result;
   return res.status(200).json(res.locals.sqlQueryText)
 };
