@@ -5,63 +5,26 @@ import './Splash.css';
 const Splash = () => {
   const navigate = useNavigate();
   //get all job listings and store in this state
-  const jawbs = [
-    {
-      title: 'Chef',
-    },
-    {
-      title: 'Artist',
-    },
-    {
-      title: 'Drummer',
-    },
-    {
-      title: 'Software Developer',
-    },
-    {
-      title: 'Cop',
-    },
-    {
-      title: 'Fireman',
-    },
-    {
-      title: 'Judge',
-    },
-    {
-      title: 'Massause',
-    },
-    {
-      title: 'Doctor',
-    },
-    {
-      title: 'Lawyer',
-    },
-    {
-      title: 'Mailman',
-    },
-    {
-      title: 'Mechanic',
-    },
-    {
-      title: 'Salesman',
-    },
-    {
-      title: 'Accountant',
-    },
-  ];
-  const [jobListings, setJobListings] = useState(jawbs);
-  //fetch job listings for now use jawbs
-  //   useEffect(() => {
-  //
-  //     try {
-  //         const response = await fetch('/api/jobs');
-  //         const data = await response.json();
-  //         setJobListings(data.jobs)
-  //     } catch (error) {
-  //         console.log('error fetching job listings:', error);
-  //         setJobListings([]);
-  //     }
-  //   }, []);
+  const [jobListings, setJobListings] = useState([]);
+
+  useEffect(() => {
+    const fetchJobListings = async () => {
+      try {
+        const response = await fetch('http://localhost:3000/job/titles');
+        const data = await response.json();
+        const formattedJobs = data.map((job) => ({
+          code: job.code,
+          title: job.title,
+        }));
+
+        setJobListings(formattedJobs);
+      } catch (error) {
+        console.log('Error fetching job listings:', error);
+        setJobListings([]);
+      }
+    };
+    fetchJobListings();
+  }, []);
 
   //navigate after time period
   useEffect(() => {

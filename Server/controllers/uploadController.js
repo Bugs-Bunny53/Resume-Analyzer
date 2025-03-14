@@ -59,45 +59,19 @@ try {
     // })
     // TODO: Not sure this is what should be sent back, since the AI response is actually what we need.
     // Send an all clear response back
-    // .then((savedData) => {
-    //   res.json({
-    //     message: "Resume processed and stored successfully",
-    //     id: savedData._id,
-    //     yaml: savedData,
-    //   });
-    // })
-    res.json({
-      message: "Resume processed and stored successfully",
-      id: savedData._id,
-      yaml: savedData,  // Respond with the stored YAML data
+    .then((savedData) => {
+      res.locals.yamlResume = savedData,
+      next()
+    })
+    // Catch errors
+    .catch((error) => {
+      console.error("❌ Error in processUpload:", error);
+      res.status(500).json({ error: error.message });
+    })
+    // Remove the file from uploads
+    .finally(() => {
+      fs.unlink(path).catch((err) => console.error("Error deleting file:", err));
     });
-  } catch (error) {
-    // Handle any errors that occur during processing
-    console.error("❌ Error in processUpload:", error);
-    res.status(500).json({ error: error.message });
-  } finally {
-    // Optionally, remove the file after processing to clean up (this part is commented out for now)
-     fs.unlink(path).catch((err) => console.error("Error deleting file:", err));
-  }
 };
-    
-//     res.json({
-//       message: "Resume processed and stored successfully",
-//       id: savedData._id,
-//       yaml: savedData,  // Respond with the stored data
-//     });
-  
-//       // Catch errors
-//      .catch((error) => {
-//       console.error("❌ Error in processUpload:", error);
-//        res.status(500).json({ error: error.message });
-       
-//     })
-//     // Remove the file from uploads
-//     // .finally(() => {
-//     //   fs.unlink(path).catch((err) => console.error("Error deleting file:", err));
-//     // });
- 
-// };
 
 export default uploadController;
