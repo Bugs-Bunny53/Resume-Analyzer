@@ -5,7 +5,7 @@ const app = express();
 const PORT = 3000;
 
 // Connect to the Mongo DB on server start
-import {connectDB} from './data/db.js';
+import { connectDB } from './data/db.js';
 connectDB();
 
 /**
@@ -49,7 +49,7 @@ app.use((req, res) => {
 
 // global error handler
 app.use((err, req, res, next) => {
-  console.log('❌ Error triggered.');
+  console.log('❌ Error triggered: ', err);
   const defaultError = {
     log: 'Express error handler caught unknown middleware error',
     status: 500,
