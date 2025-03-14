@@ -6,13 +6,13 @@ dotenv.config();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
-console.log()
+console.log();
 
-const openAiController = {}
+const openAiController = {};
 
 openAiController.analyzeContent = async (req, res, next) => {
   const yamlResume = res.locals.yamlResume;
-  const jobQueryData = res.locals.jobQuery; 
+  const jobQueryData = res.locals.jobQuery;
 
   // ------------<< PARSED RESUME YAML SHIT >>------------------
   const personalInformation = {
@@ -21,16 +21,16 @@ openAiController.analyzeContent = async (req, res, next) => {
     salaryExpectations: yamlResume.salary_expectations,
     workPreferences: yamlResume.work_preferences,
   };
-  
+
   const educationDetails = yamlResume.education_details;
-  
-  const experienceDetails = yamlResume.experience_details.flatMap((exp) => ({
+
+  const experienceDetails = yamlResume.experience_details.map((exp) => ({
     position: exp.position,
     company: exp.company,
     responsibilities: exp.key_responsibilities,
     skills: exp.skills_acquired,
   }));
-  
+
   const showcaseDetails = {
     projects: yamlResume.projects,
     achievements: yamlResume.achievements,
@@ -38,7 +38,7 @@ openAiController.analyzeContent = async (req, res, next) => {
     languages: yamlResume.languages,
     interests: yamlResume.interests,
   };
-  
+
   const selfIdentification = yamlResume.self_identification;
   const legalAuthorization = yamlResume.legal_authorization;
 
@@ -55,29 +55,31 @@ openAiController.analyzeContent = async (req, res, next) => {
 
   const workDetails = {
     tasks: jobQueryData.tasks.task.map((task) => task.title),
-    activities: jobQueryData.detailed_work_activities.activity.map((activity) => activity.title),
+    activities: jobQueryData.detailed_work_activities.activity.map(
+      (activity) => activity.title
+    ),
   };
 
   const skillsAndTools = {
-    technologySkills: jobQueryData.technology_skills.category.flatMap((category) =>
-      category.example.map((example) => example.title)
+    technologySkills: jobQueryData.technology_skills.category.flatMap(
+      (category) => category.example.map((example) => example.title)
     ),
     toolsUsed: jobQueryData.tools_used.category.flatMap((tool) => tool.example),
   };
 
-  const professionalAssociations = jobQueryData.professional_associations.source.map((association) => ({
-    name: association.name,
-    url: association.url,
-  }));
+  const professionalAssociations =
+    jobQueryData.professional_associations.source.map((association) => ({
+      name: association.name,
+      url: association.url,
+    }));
 
   const interests = jobQueryData.interests.element.map((interest) => ({
     name: interest.name,
     description: interest.description,
   }));
 
-
- // ------------<< PROMPT CONSTRUCTION >>------------------
-    const comparisonSections = {
+  // ------------<< PROMPT CONSTRUCTION >>------------------
+  const comparisonSections = {
     experienceDetails: {
       yaml: experienceDetails,
       job: workDetails,
@@ -108,46 +110,60 @@ openAiController.analyzeContent = async (req, res, next) => {
     jobZoneComparison: {
       yaml: {
         education: educationDetails,
-        experience: experienceDetails.map(exp => ({ position: exp.position, company: exp.company })),
+        experience: experienceDetails.map((exp) => ({
+          position: exp.position,
+          company: exp.company,
+        })),
       },
       job: jobInformation.jobZone,
       prompt:
         "Compare the candidate's education and experience to the job zone requirements. Identify any gaps in training or qualifications.",
-    },    
+    },
     relatedOccupations: {
-      yaml: experienceDetails.map(exp => exp.position),
+      yaml: experienceDetails.map((exp) => exp.position),
       job: jobQueryData.main.related_occupations || [],
       prompt:
         "If the candidate's experience does not fully align with the job requirements, suggest alternative related occupations they might be qualified for.",
     },
     inDemandTechnologies: {
-      yaml: experienceDetails.flatMap(exp => exp.skills),
-      job: skillsAndTools.technologySkills.filter(skill => skill.hot_technology === true),
+      yaml: experienceDetails.flatMap((exp) => exp.skills),
+      job: skillsAndTools.technologySkills.filter(
+        (skill) => skill.hot_technology === true
+      ),
       prompt:
         "Compare the candidate's skills to the list of hot technologies in demand for this role. Identify key technologies they should learn to remain competitive.",
     },
     remainingInfo: {
       yaml: {
-        personalInformation, 
-        selfIdentification, 
-        legalAuthorization
+        personalInformation,
+        selfIdentification,
+        legalAuthorization,
       },
       job: jobInformation,
       prompt:
-        "Review the remaining information for the candidate, compare their self identification, legal authorization, and personal information to the job description. Highlight any discrepancies that might exist.",
+        'Review the remaining information for the candidate, compare their self identification, legal authorization, and personal information to the job description. Highlight any discrepancies that might exist.',
     },
   };
 
   // ------------<< MAKE API CALLS IN PARALLEL >>------------------
-  const apiCalls = Object.entries(comparisonSections).map(async ([section, data]) => {
-    if (!data.yaml || !data.job || data.yaml.length === 0 || data.job.length === 0) {
-      console.warn(`Skipping ${section}: Missing relevant data`);
-      return { section, feedback: { score: 0, body: "Skipped due to missing data." } };
-    }
-  
-    const prompt = `
+  const apiCalls = Object.entries(comparisonSections).map(
+    async ([section, data]) => {
+      if (
+        !data.yaml ||
+        !data.job ||
+        data.yaml.length === 0 ||
+        data.job.length === 0
+      ) {
+        console.warn(`Skipping ${section}: Missing relevant data`);
+        return {
+          section,
+          feedback: { score: 0, body: 'Skipped due to missing data.' },
+        };
+      }
+
+      const prompt = `
       You are an AI resume evaluator. Your task is to compare the resume information to the job posting and provide **constructive feedback**.
-      \n**Category: ${section.replace(/([A-Z])/g, " $1").trim()}**
+      \n**Category: ${section.replace(/([A-Z])/g, ' $1').trim()}**
       \n**Resume Data:** ${JSON.stringify(data.yaml, null, 2)}
       \n**Job Data:** ${JSON.stringify(data.job, null, 2)}
       \n${data.prompt}
@@ -157,40 +173,58 @@ openAiController.analyzeContent = async (req, res, next) => {
         "body": "Detailed feedback here."
       }
     `;
-  
-    console.log(`🔵 Sending request to OpenAI for section: ${section}`);
-  
-    try {
-      const response = await openai.chat.completions.create({
-        model: "gpt-4",
-        messages: [
-          { role: "system", content: "You are an AI assistant that compares resumes to job postings and provides structured feedback in JSON format." },
-          { role: "user", content: prompt },
-        ],
-        temperature: 0.7,
-      });
-  
-      const rawResponse = response.choices?.[0]?.message?.content;
-      console.log(`🟢 OpenAI Response for ${section}:`, rawResponse);
-  
-      let structuredFeedback;
+
+      console.log(`🔵 Sending request to OpenAI for section: ${section}`);
+
       try {
-        structuredFeedback = JSON.parse(rawResponse);
-      } catch (jsonError) {
-        console.error(`❌ Error parsing JSON response for ${section}:`, jsonError);
-        structuredFeedback = { score: 0, body: "Invalid JSON response from AI." };
+        const response = await openai.chat.completions.create({
+          model: 'gpt-4',
+          messages: [
+            {
+              role: 'system',
+              content:
+                'You are an AI assistant that compares resumes to job postings and provides structured feedback in JSON format.',
+            },
+            { role: 'user', content: prompt },
+          ],
+          temperature: 0.7,
+        });
+
+        const rawResponse = response.choices?.[0]?.message?.content;
+        console.log(`🟢 OpenAI Response for ${section}:`, rawResponse);
+
+        let structuredFeedback;
+        try {
+          structuredFeedback = JSON.parse(rawResponse);
+        } catch (jsonError) {
+          console.error(
+            `❌ Error parsing JSON response for ${section}:`,
+            jsonError
+          );
+          structuredFeedback = {
+            score: 0,
+            body: 'Invalid JSON response from AI.',
+          };
+        }
+
+        return { section, feedback: structuredFeedback };
+      } catch (apiError) {
+        console.error(`❌ OpenAI API error for section ${section}:`, apiError);
+        return {
+          section,
+          feedback: { score: 0, body: 'OpenAI request failed.' },
+        };
       }
-  
-      return { section, feedback: structuredFeedback };
-    } catch (apiError) {
-      console.error(`❌ OpenAI API error for section ${section}:`, apiError);
-      return { section, feedback: { score: 0, body: "OpenAI request failed." } };
     }
-  });
+  );
 
   // Wait for all API responses
   const results = await Promise.all(apiCalls);
-  res.json({ feedback: Object.fromEntries(results.map(({ section, feedback }) => [section, feedback])) });
+  res.json({
+    feedback: Object.fromEntries(
+      results.map(({ section, feedback }) => [section, feedback])
+    ),
+  });
 };
 
 /*
