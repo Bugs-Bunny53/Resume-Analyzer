@@ -5,15 +5,15 @@ const app = express();
 const PORT = 3000;
 
 // Connect to the Mongo DB on server start
-import connectDB from './data/db.js';
+import {connectDB} from './data/db.js';
 connectDB();
 
 /**
  * require routers
  */
 import oNetRouter from './routes/oNetRouter.js';
-import authRouter from './routes/authRouter.js';
-import dataRouter from './routes/dataRouter.js';
+// import authRouter from './routes/authRouter.js';
+// import dataRouter from './routes/dataRouter.js';
 import uploadRouter from './routes/uploadRouter.js';
 
 /**
@@ -36,10 +36,10 @@ app.use('/upload', (req, res, next) => {
   uploadRouter(req, res, next);
 });
 
-app.use('/', (req, res, next) => {
-  console.log('🫚 Incoming request for root!');
-  authRouter(req, res, next);
-});
+// app.use('/', (req, res, next) => {
+//   console.log('🫚 Incoming request for root!');
+//   authRouter(req, res, next);
+// });
 
 // catch-all route handler for any requests to an unknown route
 app.use((req, res) => {
