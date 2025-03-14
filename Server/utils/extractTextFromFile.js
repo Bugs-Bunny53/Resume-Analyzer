@@ -21,6 +21,11 @@ export const extractTextFromFile = async (filePath, mimeType) => {
     const doc = await docx4js.load(fileBuffer);
     return doc.toString();
   }
+  if (mimeType === "text/plain"){
+
+    return fileBuffer.toString("utf8");
+  }
+    
 
   throw new Error("Unsupported file format");
 };

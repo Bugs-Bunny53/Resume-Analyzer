@@ -1,4 +1,9 @@
 import mongoose from "mongoose";
+import dotenv from 'dotenv'
+dotenv.config()
+
+
+mongoose.connect('mongodb+srv://hayashi3386:analyzer@cluster33.xhn1r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster33', {})
 
 const yamlSchema = new mongoose.Schema(
   {
