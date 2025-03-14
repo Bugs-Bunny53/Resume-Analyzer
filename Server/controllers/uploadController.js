@@ -8,6 +8,8 @@ const uploadController = {};
 
 uploadController.processUpload = async (req, res, next) => {
   console.log('👓 Processing File Upload!');
+  console.log("req.file is", req.file)
+  
   if (!req.file)
     return next({
       log: 'uploadController did nto receive a valid file.',
@@ -18,6 +20,17 @@ uploadController.processUpload = async (req, res, next) => {
   const { path, mimetype } = req.file;
 
 try {
+
+  const supportedFormats = [
+    'application/pdf',
+    'text/plaiin',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  ];
+
+  if (!supportedFormats.includes(mimetype)) {
+    throw new Error('Unsupported file format. Please uplaod a PDF, text, or Word document.');
+  }
+  
   const extractedText = await extractTextFromFile(path, mimetype);
 
   const yamlData = await generateYAMLWithAI(extractedText);  
