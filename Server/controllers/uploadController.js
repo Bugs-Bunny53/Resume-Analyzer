@@ -17,7 +17,7 @@ uploadController.processUpload = async (req, res, next) => {
       message: { err: 'No file to process.' },
     });
 
-  const { path, mimetype } = req.file;
+  const { buffer, mimetype } = req.file;
 
   try {
     const supportedFormats = [
@@ -30,7 +30,7 @@ uploadController.processUpload = async (req, res, next) => {
       throw new Error('Unsupported file format. Please upload a PDF, text, or Word document.');
     }
 
-    const extractedText = await extractTextFromFile(path, mimetype);
+    const extractedText = await extractTextFromFile(buffer, mimetype);
     const yamlData = await generateYAMLWithAI(extractedText);
     
     console.log("✅ AI-Generated YAML:", yamlData);

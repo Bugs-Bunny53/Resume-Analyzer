@@ -5,7 +5,8 @@ import openAIAnalysisController from '../controllers/openAIController.js';
 import oNetController from '../controllers/oNetController.js';
 
 const router = express.Router();
-const upload = multer({ dest: 'uploads/' });
+const storage = multer.memoryStorage()
+const upload = multer({ storage: storage });
 
 // * Router to handle uploads
 router.post(
